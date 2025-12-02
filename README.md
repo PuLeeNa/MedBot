@@ -1,11 +1,14 @@
 # 🏥 MedBot
 
+## 🌐 Live Demo
+
+**Try it now:** [https://medbot-jvsz.onrender.com](https://medbot-jvsz.onrender.com)
+
 An intelligent medical chatbot powered by **Groq API (Llama 3.3 70B)**, **LangChain**, and **Pinecone** vector database. This RAG (Retrieval-Augmented Generation) application provides accurate medical information by retrieving relevant context from medical documents and generating fast, high-quality responses using Groq's lightning-fast inference API.
 
 ![Python](https://img.shields.io/badge/Python-3.10-blue)
 ![Flask](https://img.shields.io/badge/Flask-3.1.0-green)
 ![LangChain](https://img.shields.io/badge/LangChain-1.1.0-orange)
-![License](https://img.shields.io/badge/License-MIT-yellow)
 
 ## 📋 Table of Contents
 
@@ -373,8 +376,6 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## 📧 Contact
 
 **PuLeeNa** - [@PuLeeNa](https://github.com/PuLeeNa)
-
-Project Link: [https://github.com/PuLeeNa/Medical-Chatbot-using-Llama2](https://github.com/PuLeeNa/Medical-Chatbot-using-Llama2)
 
 ---
 
