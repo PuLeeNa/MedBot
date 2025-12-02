@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: medbot
+    runtime: docker
+    plan: free
+    branch: main
+    healthCheckPath: /
+    envVars:
+      - key: PINECONE_API_KEY
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: PYTHON_VERSION
+        value: 3.10.0
+      - key: PORT
+        value: 5000
+    autoDeploy: true

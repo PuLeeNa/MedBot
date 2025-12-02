@@ -297,6 +297,61 @@ Groq API is already optimized for speed (up to 10x faster than local models), bu
 - Cache common responses
 - Consider upgrading to paid tier for production
 
+## 🐳 Docker Deployment
+
+### Local Docker Testing
+
+```bash
+# Build the Docker image
+docker build -t medbot:latest .
+
+# Run with docker-compose
+docker-compose up -d
+
+# Check logs
+docker-compose logs -f
+
+# Stop containers
+docker-compose down
+```
+
+### Deploy to Render
+
+1. **Push code to GitHub**:
+
+   ```bash
+   git add .
+   git commit -m "Add Docker and CI/CD configuration"
+   git push origin main
+   ```
+
+2. **Set up Render**:
+
+   - Go to [Render Dashboard](https://dashboard.render.com/)
+   - Click "New +" → "Web Service"
+   - Connect your GitHub repository
+   - Render will auto-detect `render.yaml`
+
+3. **Configure Environment Variables** in Render:
+
+   - `PINECONE_API_KEY`: Your Pinecone API key
+   - `GROQ_API_KEY`: Your Groq API key
+
+4. **Optional - Setup CI/CD**:
+   - Go to your GitHub repository Settings → Secrets and variables → Actions
+   - Add secret: `RENDER_DEPLOY_HOOK_URL` (get from Render Settings → Deploy Hook)
+   - CI/CD will auto-deploy on push to main branch
+
+### CI/CD Pipeline Features
+
+The GitHub Actions pipeline includes:
+
+- ✅ Code quality checks (flake8)
+- ✅ Security scanning (bandit)
+- ✅ Docker image build and test
+- ✅ Automated deployment to Render
+- ✅ Build caching for faster deployments
+
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.

@@ -9,7 +9,7 @@ from src.helper import download_hugging_face_embeddings
 from langchain_pinecone import PineconeVectorStore
 from langchain_core.prompts import PromptTemplate
 from langchain_groq import ChatGroq
-from langchain_classic.chains import RetrievalQA
+from langchain.chains import RetrievalQA
 from dotenv import load_dotenv
 from src.prompt import *
 from src.common_responses import check_common_question
@@ -70,4 +70,5 @@ def chat():
     return str(result['result'])
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.getenv("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=False)
