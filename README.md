@@ -1,6 +1,6 @@
 # 🏥 MedBot
 
-An intelligent medical chatbot powered by **Llama 2 7B**, **LangChain**, and **Pinecone** vector database. This RAG (Retrieval-Augmented Generation) application provides accurate medical information by retrieving relevant context from medical documents and generating responses using a locally-hosted language model.
+An intelligent medical chatbot powered by **Groq API (Llama 3.3 70B)**, **LangChain**, and **Pinecone** vector database. This RAG (Retrieval-Augmented Generation) application provides accurate medical information by retrieving relevant context from medical documents and generating fast, high-quality responses using Groq's lightning-fast inference API.
 
 ![Python](https://img.shields.io/badge/Python-3.10-blue)
 ![Flask](https://img.shields.io/badge/Flask-3.1.0-green)
@@ -24,12 +24,13 @@ An intelligent medical chatbot powered by **Llama 2 7B**, **LangChain**, and **P
 ## ✨ Features
 
 - 🤖 **RAG-based Architecture**: Retrieves relevant medical information from documents before generating responses
-- 🏠 **Local LLM**: Runs Llama 2 7B model locally for privacy and cost-effectiveness
+- ⚡ **Lightning-Fast API**: Powered by Groq's ultra-fast inference (up to 10x faster than local models)
 - 🎯 **Vector Search**: Uses Pinecone for efficient semantic search across medical documents
 - 💬 **Interactive UI**: Clean, responsive chat interface with typing indicators
-- 🔒 **Privacy-First**: All model inference happens locally, no data sent to external APIs
-- ⚡ **Optimized Performance**: Configurable token limits and context windows
+- 🆓 **Free Tier Available**: Groq offers generous free API access (14,400 requests/day)
+- 🚀 **High-Quality Responses**: Uses Llama 3.3 70B model for superior accuracy
 - 📚 **Document Support**: Processes PDF medical documents with PyMuPDF
+- 💡 **Smart Caching**: Common responses feature for frequently asked questions
 
 ## 🏗️ Architecture
 
@@ -37,26 +38,27 @@ This is a **RAG (Retrieval-Augmented Generation)** chatbot:
 
 1. **Retrieval**: Searches Pinecone vector database for relevant medical document chunks
 2. **Augmentation**: Injects retrieved context into the prompt template
-3. **Generation**: Llama 2 generates accurate responses based on the context
+3. **Generation**: Groq API (Llama 3.3 70B) generates fast, accurate responses based on the context
 
 ```
 User Query → Embeddings → Pinecone Search → Context Retrieval →
-Prompt Template → Llama 2 Model → Response
+Prompt Template → Groq API (Llama 3.3 70B) → Response
 ```
 
 ## 🛠️ Tech Stack
 
 ### Core Technologies
 
-- **LLM**: Llama 2 7B Chat (Q4_0 quantized GGUF format)
+- **LLM**: Groq API - Llama 3.3 70B Versatile
 - **Framework**: LangChain 1.1.0
 - **Vector DB**: Pinecone
 - **Embeddings**: HuggingFace sentence-transformers (all-MiniLM-L6-v2)
 - **Backend**: Flask 3.1.0
-- **Model Inference**: CTransformers 0.2.27
+- **Model Inference**: langchain-groq 1.1.0
 
 ### Key Libraries
 
+- `langchain-groq` - Groq API integration for fast LLM inference
 - `langchain-community` - Document loaders and LLM integrations
 - `langchain-pinecone` - Pinecone vector store integration
 - `langchain-huggingface` - HuggingFace embeddings
@@ -67,10 +69,9 @@ Prompt Template → Llama 2 Model → Response
 ## 📦 Prerequisites
 
 - Python 3.10 or higher
-- Conda (Anaconda/Miniconda)
-- 8GB+ RAM (for Llama 2 7B model)
+- Conda (Anaconda/Miniconda) - Optional
 - Pinecone API key ([Get it here](https://www.pinecone.io/))
-- Llama 2 7B Chat GGUF model file
+- Groq API key ([Get free key here](https://console.groq.com/))
 
 ## 🚀 Installation
 
@@ -94,18 +95,6 @@ conda activate mchatbot
 pip install -r requirements.txt
 ```
 
-### Step 4: Download Llama 2 Model
-
-Download the Llama 2 7B Chat GGUF model and place it in the `model/` directory:
-
-```bash
-# The model file should be: model/llama-2-7b-chat.Q4_0.gguf
-```
-
-You can download from:
-
-- [TheBloke's HuggingFace](https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGUF)
-
 ## ⚙️ Configuration
 
 ### Step 1: Set up Environment Variables
@@ -114,7 +103,15 @@ Create a `.env` file in the root directory:
 
 ```bash
 PINECONE_API_KEY=your_pinecone_api_key_here
+GROQ_API_KEY=your_groq_api_key_here
 ```
+
+**Get your free Groq API key:**
+
+1. Visit [https://console.groq.com/](https://console.groq.com/)
+2. Sign up for a free account
+3. Navigate to API Keys section
+4. Create a new API key and copy it
 
 ### Step 2: Prepare Medical Documents
 
@@ -171,17 +168,14 @@ Medical-Chatbot-using-Llama2/
 ├── src/
 │   ├── __init__.py
 │   ├── helper.py               # Helper functions (PDF loading, embeddings)
-│   └── prompt.py               # Prompt templates
+│   ├── prompt.py               # Prompt templates
+│   └── common_responses.py     # Common question responses cache
 │
 ├── templates/
 │   └── chat.html               # Chat UI template
 │
 ├── static/
-│   ├── style.css               # UI styling
-│   └── logo.png                # Logo image
-│
-├── model/
-│   └── llama-2-7b-chat.Q4_0.gguf  # LLM model file
+│   └── style.css               # UI styling
 │
 ├── data/
 │   └── Medical_book.pdf        # Medical documents (PDFs)
@@ -225,14 +219,11 @@ response = qa.invoke({"query": query})
 ### 3. Model Configuration
 
 ```python
-llm = CTransformers(
-    model="model/llama-2-7b-chat.Q4_0.gguf",
-    model_type="llama",
-    config={
-        "max_new_tokens": 1024,      # Maximum response length
-        "temperature": 0.8,           # Creativity (0=deterministic, 1=creative)
-        "context_length": 2048        # Total token capacity
-    }
+llm = ChatGroq(
+    model="llama-3.3-70b-versatile",  # Fast and efficient Groq model
+    temperature=0.8,                   # Creativity (0=deterministic, 1=creative)
+    max_tokens=1024,                   # Maximum response length
+    groq_api_key=os.getenv("GROQ_API_KEY")  # API key from .env file
 )
 ```
 
@@ -246,28 +237,29 @@ Number of tokens (974) exceeded maximum context length (512)
 
 **Solution**: Increase `context_length` and `max_new_tokens` in `app.py`
 
-### Issue: Slow Responses
+### Issue: Rate Limit Exceeded
+
+```
+Rate limit exceeded: 30 requests per minute
+```
 
 **Solutions**:
 
-- Reduce `max_new_tokens` to 512
-- Reduce retrieved documents: `search_kwargs={'k': 1}`
-- Add multi-threading: `config={"threads": 8}`
-- Use GPU if available: `config={"gpu_layers": 35}`
+- Implement request queuing in Flask
+- Add caching for common questions (already included)
+- Upgrade to Groq paid tier if needed
+- Add rate limiting on frontend
 
-### Issue: Model Not Found
+### Issue: Invalid API Key
 
 ```
-RepositoryNotFoundError: 401 Client Error
+AuthenticationError: Invalid API key
 ```
 
-**Solution**: Use absolute path and add `local_files_only=True`:
+**Solution**: Verify your Groq API key in `.env` file:
 
-```python
-llm = CTransformers(
-    model="C:/path/to/model/llama-2-7b-chat.Q4_0.gguf",
-    local_files_only=True
-)
+```bash
+GROQ_API_KEY=gsk_your_actual_key_here
 ```
 
 ### Issue: Conda Not Recognized
@@ -284,17 +276,26 @@ Then restart PowerShell.
 
 ### Speed Improvements
 
-1. **Reduce Context Window**: Lower `context_length` to 1024
-2. **Limit Tokens**: Set `max_new_tokens` to 256-512
-3. **Fewer Retrievals**: Use `search_kwargs={'k': 1}`
-4. **CPU Threading**: Add `"threads": 8` to config
-5. **Use Smaller Model**: Consider TinyLlama or Llama 2 3B
+Groq API is already optimized for speed (up to 10x faster than local models), but you can further optimize:
 
-### Memory Optimization
+1. **Limit Tokens**: Set `max_tokens` to 512 for faster responses
+2. **Fewer Retrievals**: Use `search_kwargs={'k': 1}` for single-document retrieval
+3. **Use Caching**: Leverage `common_responses.py` for frequent questions
+4. **Optimize Embeddings**: Cache embedding results for repeated queries
 
-- Use quantized models (Q4_0, Q5_0)
-- Limit concurrent requests
-- Clear cache periodically
+### Groq Free Tier Limits
+
+- **Requests per minute**: 30 RPM
+- **Requests per day**: 14,400 RPD
+- **Tokens per minute**: ~20,000 TPM
+- **Max context window**: 32,768 tokens
+
+### Rate Limit Management
+
+- Implement request queuing
+- Add exponential backoff on rate limit errors
+- Cache common responses
+- Consider upgrading to paid tier for production
 
 ## 🤝 Contributing
 
@@ -308,7 +309,8 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 🙏 Acknowledgments
 
-- [Meta AI](https://ai.meta.com/) - Llama 2 model
+- [Groq](https://groq.com/) - Lightning-fast LLM inference API
+- [Meta AI](https://ai.meta.com/) - Llama 3.3 70B model
 - [LangChain](https://www.langchain.com/) - RAG framework
 - [Pinecone](https://www.pinecone.io/) - Vector database
 - [HuggingFace](https://huggingface.co/) - Embeddings models
