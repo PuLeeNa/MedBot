@@ -1,6 +1,6 @@
 --extra-index-url https://download.pytorch.org/whl/cpu
 torch==2.2.0+cpu
-sentence-transformers==3.3.1
+sentence-transformers==2.5.1
 langchain-groq==0.2.1
 pinecone-client==5.0.1
 langchain==0.3.11
@@ -11,6 +11,5 @@ langchain-huggingface==0.1.2
 pydantic==2.10.3
 flask==3.1.0
 pypdf==5.1.0
-pymupdf==1.24.14
 python-dotenv==1.0.1
 gunicorn==21.2.0
