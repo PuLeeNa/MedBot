@@ -17,14 +17,13 @@ def text_split(extracted_data):
 
     return text_chunks
 
-# download embeddings model (ultra memory optimized for free tier)
+# download embeddings model (memory optimized)
 def download_hugging_face_embeddings():
-    # Using smaller, lighter model for 512MB RAM constraint
-    model_name = "sentence-transformers/paraphrase-MiniLM-L3-v2"  # Smaller than L6
+    model_name = "sentence-transformers/all-MiniLM-L6-v2"
     embeddings = HuggingFaceEmbeddings(
         model_name=model_name,
         model_kwargs={'device': 'cpu'},
-        encode_kwargs={'normalize_embeddings': True, 'batch_size': 1, 'show_progress_bar': False}
+        encode_kwargs={'normalize_embeddings': True, 'batch_size': 1}
     )
 
     return embeddings
