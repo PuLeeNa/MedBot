@@ -15,6 +15,15 @@
 	
 	
 	<body>
+		<!-- Loading Overlay -->
+		<div id="loading-overlay" class="loading-overlay">
+			<div class="loading-spinner">
+				<div class="spinner"></div>
+				<p>Loading MedBot...</p>
+				<p class="loading-subtext">Initializing medical assistant</p>
+			</div>
+		</div>
+		
 		<div class="container-fluid h-100">
 			<div class="row justify-content-center h-100">		
 				<div class="col-md-8 col-xl-6 chat">
@@ -49,6 +58,13 @@
 		</div>
 		
 		<script>
+			// Hide loading overlay when page is fully loaded
+			window.addEventListener('load', function() {
+				setTimeout(function() {
+					document.getElementById('loading-overlay').style.display = 'none';
+				}, 1000);
+			});
+			
 			$(document).ready(function() {
 				var botLogoUrl = "{{ url_for('static', filename='logo.jpg') }}";
 				
