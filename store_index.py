@@ -18,40 +18,35 @@ embeddings = download_hugging_face_embeddings()
 
 # Initializing Pinecone
 pc = Pinecone(api_key=PINECONE_API_KEY)
-index_name = "medical-chatbot"
+index_name = "medical-chatbotn"
 
-# Create index if it doesn't exist
-if index_name not in pc.list_indexes().names():
-    pc.create_index(
-        name=index_name,
-        dimension=384,
-        metric='cosine',
-        spec=ServerlessSpec(
-            cloud='aws',
-            region="us-east-1"
-        )
+# Delete old index if it exists (to recreate with API embeddings)
+if index_name in pc.list_indexes().names():
+    print(f"Deleting existing index: {index_name}")
+    pc.delete_index(index_name)
+    print(f"Index {index_name} deleted successfully")
+    import time
+    time.sleep(10)  # Wait for deletion to complete
+
+# Create new index with API embeddings
+print(f"Creating new index: {index_name}")
+pc.create_index(
+    name=index_name,
+    dimension=384,  # all-MiniLM-L6-v2 dimension
+    metric='cosine',
+    spec=ServerlessSpec(
+        cloud='aws',
+        region="us-east-1"
     )
+)
+print("Index created successfully")
 
-# Get the index object
-index = pc.Index(index_name)
-
-# Check if index is empty
-stats = index.describe_index_stats()
-record_count = stats.get('total_vector_count', 0)
-
-if record_count == 0:
-    # If index is empty, add embeddings
-    docsearch = PineconeVectorStore.from_texts(
-        [t.page_content for t in text_chunks], 
-        embeddings, 
-        index_name=index_name,
-        pinecone_api_key=PINECONE_API_KEY
-    )
-else:
-    # If index has records, just connect to it
-    docsearch = PineconeVectorStore.from_existing_index(
-        index_name=index_name,
-        embedding=embeddings
-    )
-    
-
+# Add embeddings to the new index
+print("Adding document embeddings to index...")
+docsearch = PineconeVectorStore.from_texts(
+    [t.page_content for t in text_chunks], 
+    embeddings, 
+    index_name=index_name
+)
+print(f"Successfully indexed {len(text_chunks)} text chunks")
+print("Pinecone index is ready!")

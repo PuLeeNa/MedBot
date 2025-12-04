@@ -1,6 +1,5 @@
 from langchain_community.document_loaders import PyMuPDFLoader, DirectoryLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_community.embeddings import HuggingFaceInferenceAPIEmbeddings
 import os
 
 # Extract data from pdf
@@ -15,15 +14,12 @@ def text_split(extracted_data):
     text_chunks = text_splitter.split_documents(extracted_data)
     return text_chunks
 
-# Use HuggingFace Inference API (no model download needed)
+# Use HuggingFace Endpoint for embeddings
 def download_hugging_face_embeddings():
-    """
-    Uses HuggingFace Inference API instead of local model.
-    Requires HUGGINGFACE_API_KEY environment variable.
-    Get free API key from: https://huggingface.co/settings/tokens
-    """
-    embeddings = HuggingFaceInferenceAPIEmbeddings(
-        api_key=os.getenv("HUGGINGFACE_API_KEY"),
-        model_name="sentence-transformers/all-MiniLM-L6-v2"
+    from langchain_huggingface import HuggingFaceEndpointEmbeddings
+    
+    embeddings = HuggingFaceEndpointEmbeddings(
+        model="sentence-transformers/all-MiniLM-L6-v2",
+        huggingfacehub_api_token=os.getenv("HUGGINGFACE_API_KEY")
     )
     return embeddings

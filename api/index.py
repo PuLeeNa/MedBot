@@ -72,6 +72,6 @@ def chat():
     if common_response:
         return str(common_response)
     
-    qa = get_qa_chain()  # Lazy load QA chain
+    qa = get_qa_chain() 
     result = qa.invoke({"query": input_msg})
     return str(result['result'])
