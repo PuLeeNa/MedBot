@@ -19,8 +19,7 @@ def download_hugging_face_embeddings():
     from langchain_huggingface import HuggingFaceEndpointEmbeddings
     
     embeddings = HuggingFaceEndpointEmbeddings(
-        model="https://router.huggingface.co/models/sentence-transformers/all-MiniLM-L6-v2",
-        huggingfacehub_api_token=os.getenv("HUGGINGFACE_API_KEY"),
-        task="feature-extraction"
+        model="sentence-transformers/all-MiniLM-L6-v2",
+        huggingfacehub_api_token=os.getenv("HUGGINGFACE_API_KEY")
     )
     return embeddings
