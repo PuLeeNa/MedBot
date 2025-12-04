@@ -5,6 +5,7 @@ services:
     plan: free
     branch: main
     rootDir: backend
+    dockerfilePath: ./Dockerfile
     healthCheckPath: /
     envVars:
       - key: PINECONE_API_KEY
