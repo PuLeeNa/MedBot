@@ -14,7 +14,7 @@ def text_split(extracted_data):
     text_chunks = text_splitter.split_documents(extracted_data)
     return text_chunks
 
-# Use HuggingFace Endpoint for embeddings
+# Use HuggingFace Endpoint for embeddings (updated version supports new router)
 def download_hugging_face_embeddings():
     from langchain_huggingface import HuggingFaceEndpointEmbeddings
     
