@@ -1,25 +1,29 @@
 from langchain_community.document_loaders import PyMuPDFLoader, DirectoryLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-import os
+from langchain_huggingface import HuggingFaceEmbeddings
 
 # Extract data from pdf
 def load_pdf(data):
     loader = DirectoryLoader(data, glob="*.pdf", loader_cls=PyMuPDFLoader)
+
     documents = loader.load()
+
     return documents
 
 # Create text chunks
 def text_split(extracted_data):
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=20)
     text_chunks = text_splitter.split_documents(extracted_data)
+
     return text_chunks
 
-# Use HuggingFace Endpoint for embeddings (updated version supports new router)
+# download embeddings model (memory optimized)
 def download_hugging_face_embeddings():
-    from langchain_huggingface import HuggingFaceEndpointEmbeddings
-    
-    embeddings = HuggingFaceEndpointEmbeddings(
-        model="sentence-transformers/all-MiniLM-L6-v2",
-        huggingfacehub_api_token=os.getenv("HUGGINGFACE_API_KEY")
+    model_name = "sentence-transformers/all-MiniLM-L6-v2"
+    embeddings = HuggingFaceEmbeddings(
+        model_name=model_name,
+        model_kwargs={'device': 'cpu'},
+        encode_kwargs={'normalize_embeddings': True, 'batch_size': 1}
     )
+
     return embeddings

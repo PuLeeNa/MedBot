@@ -20,19 +20,18 @@ embeddings = download_hugging_face_embeddings()
 pc = Pinecone(api_key=PINECONE_API_KEY)
 index_name = "medical-chatbotn"
 
-# Delete old index if it exists (to recreate with API embeddings)
+# Delete old index if it exists
 if index_name in pc.list_indexes().names():
     print(f"Deleting existing index: {index_name}")
     pc.delete_index(index_name)
     print(f"Index {index_name} deleted successfully")
     import time
-    time.sleep(10)  # Wait for deletion to complete
+    time.sleep(10) 
 
-# Create new index with API embeddings
 print(f"Creating new index: {index_name}")
 pc.create_index(
     name=index_name,
-    dimension=384,  # all-MiniLM-L6-v2 dimension
+    dimension=384, 
     metric='cosine',
     spec=ServerlessSpec(
         cloud='aws',
@@ -41,7 +40,6 @@ pc.create_index(
 )
 print("Index created successfully")
 
-# Add embeddings to the new index
 print("Adding document embeddings to index...")
 docsearch = PineconeVectorStore.from_texts(
     [t.page_content for t in text_chunks], 
