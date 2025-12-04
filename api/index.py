@@ -9,7 +9,7 @@ warnings.filterwarnings('ignore')
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, request
 from src.helper import download_hugging_face_embeddings
 from langchain_pinecone import PineconeVectorStore
 from langchain_core.prompts import PromptTemplate
@@ -25,35 +25,39 @@ app = Flask(__name__,
 
 load_dotenv()
 
-PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+# Lazy initialization of QA chain for Vercel serverless
+_qa = None
 
-# Initialize embeddings and vector store
-embeddings = download_hugging_face_embeddings()
-index_name = "medical-chatbotn"
-docsearch = PineconeVectorStore.from_existing_index(
-    index_name=index_name,
-    embedding=embeddings
-)
-
-# Setup LLM and QA chain
-PROMPT = PromptTemplate(template=prompt_template, input_variables=["context", "question"])
-chain_type_kwargs = {"prompt": PROMPT}
-
-llm = ChatGroq(
-    model="llama-3.3-70b-versatile", 
-    temperature=0.8,
-    max_tokens=1024,
-    groq_api_key=GROQ_API_KEY
-)
-
-qa = RetrievalQA.from_chain_type(
-    llm=llm,
-    chain_type="stuff",
-    retriever=docsearch.as_retriever(search_kwargs={'k': 2}),
-    return_source_documents=True,
-    chain_type_kwargs=chain_type_kwargs
-)
+def get_qa_chain():
+    global _qa
+    if _qa is None:
+        # Initialize embeddings and vector store
+        embeddings = download_hugging_face_embeddings()
+        index_name = "medical-chatbotn"
+        docsearch = PineconeVectorStore.from_existing_index(
+            index_name=index_name,
+            embedding=embeddings
+        )
+        
+        # Setup LLM and QA chain
+        PROMPT = PromptTemplate(template=prompt_template, input_variables=["context", "question"])
+        chain_type_kwargs = {"prompt": PROMPT}
+        
+        llm = ChatGroq(
+            model="llama-3.3-70b-versatile", 
+            temperature=0.8,
+            max_tokens=1024,
+            groq_api_key=os.getenv("GROQ_API_KEY")
+        )
+        
+        _qa = RetrievalQA.from_chain_type(
+            llm=llm,
+            chain_type="stuff",
+            retriever=docsearch.as_retriever(search_kwargs={'k': 2}),
+            return_source_documents=True,
+            chain_type_kwargs=chain_type_kwargs
+        )
+    return _qa
 
 @app.route("/")
 def index():
@@ -64,16 +68,10 @@ def chat():
     msg = request.form["msg"]
     input_msg = msg.strip()
     
-    # Check for common questions first
     common_response = check_common_question(input_msg)
     if common_response:
         return str(common_response)
     
-    # If not a common question, use RAG + LLM
+    qa = get_qa_chain()  # Lazy load QA chain
     result = qa.invoke({"query": input_msg})
     return str(result['result'])
-
-# Vercel serverless handler
-def handler(request):
-    with app.request_context(request.environ):
-        return app.full_dispatch_request()
