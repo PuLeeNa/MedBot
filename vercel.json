@@ -23,9 +23,5 @@
       "src": "/(.*)",
       "dest": "/api/index.py"
     }
-  ],
-  "env": {
-    "PINECONE_API_KEY": "@pinecone_api_key",
-    "GROQ_API_KEY": "@groq_api_key"
-  }
+  ]
 }
