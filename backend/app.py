@@ -4,7 +4,7 @@ warnings.filterwarnings('ignore')
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # Suppress TensorFlow warnings
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'  # Disable oneDNN warnings
 
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 from src.helper import download_hugging_face_embeddings
 from langchain_pinecone import PineconeVectorStore
@@ -53,9 +53,9 @@ qa = RetrievalQA.from_chain_type(
 
 @app.route("/")
 def index():
-    return render_template('chat.html')
+    return jsonify({"status": "online", "message": "Medical Chatbot API"})
 
-@app.route("/get", methods=["GET","POST"])
+@app.route("/get", methods=["POST"])
 def chat():
     msg = request.form["msg"]
     input_msg = msg.strip()

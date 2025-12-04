@@ -17,7 +17,7 @@ def text_split(extracted_data):
 
     return text_chunks
 
-# download embeddings model (memory optimized)
+# download embeddings model
 def download_hugging_face_embeddings():
     model_name = "sentence-transformers/all-MiniLM-L6-v2"
     embeddings = HuggingFaceEmbeddings(

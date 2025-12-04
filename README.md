@@ -37,6 +37,11 @@ An intelligent medical chatbot powered by **Groq API (Llama 3.3 70B)**, **LangCh
 
 ## 🏗️ Architecture
 
+**Split Deployment:**
+
+- **Frontend**: Static files on Netlify (fast CDN delivery, no cold start UI)
+- **Backend**: Flask API on Render (handles AI processing)
+
 This is a **RAG (Retrieval-Augmented Generation)** chatbot:
 
 1. **Retrieval**: Searches Pinecone vector database for relevant medical document chunks
@@ -44,8 +49,7 @@ This is a **RAG (Retrieval-Augmented Generation)** chatbot:
 3. **Generation**: Groq API (Llama 3.3 70B) generates fast, accurate responses based on the context
 
 ```
-User Query → Embeddings → Pinecone Search → Context Retrieval →
-Prompt Template → Groq API (Llama 3.3 70B) → Response
+User → Netlify Frontend → Render Backend API → Pinecone → Groq LLM → Response
 ```
 
 ## 🛠️ Tech Stack
@@ -76,115 +80,95 @@ Prompt Template → Groq API (Llama 3.3 70B) → Response
 - Pinecone API key ([Get it here](https://www.pinecone.io/))
 - Groq API key ([Get free key here](https://console.groq.com/))
 
-## 🚀 Installation
+## 🚀 Quick Deploy
 
-### Step 1: Clone the Repository
+### Backend (Render)
+
+1. Push to GitHub main branch
+2. Auto-deploys via `backend-ci-cd.yml`
+3. Requires secrets: `RENDER_SERVICE_ID`, `RENDER_API_KEY`
+
+### Frontend (Netlify)
+
+1. Push to GitHub main branch
+2. Auto-deploys via `frontend-ci-cd.yml`
+3. Requires secrets: `NETLIFY_AUTH_TOKEN`, `NETLIFY_SITE_ID`
+
+## 💻 Local Development
+
+### Backend Setup
 
 ```bash
-git clone https://github.com/PuLeeNa/Medical-Chatbot-using-Llama2.git
-cd Medical-Chatbot-using-Llama2
-```
-
-### Step 2: Create Conda Environment
-
-```bash
+cd backend
 conda create -n mchatbot python=3.10 -y
 conda activate mchatbot
+pip install -r requirements.txt
+python app.py
 ```
 
-### Step 3: Install Dependencies
+### Frontend Setup
 
 ```bash
-pip install -r requirements.txt
+cd frontend
+python -m http.server 8000
+# Visit: http://localhost:8000
 ```
 
 ## ⚙️ Configuration
 
-### Step 1: Set up Environment Variables
+### Environment Variables
 
-Create a `.env` file in the root directory:
+**Backend (.env)**:
 
 ```bash
 PINECONE_API_KEY=your_pinecone_api_key_here
 GROQ_API_KEY=your_groq_api_key_here
 ```
 
-**Get your free Groq API key:**
+**Frontend (app.js)**:
+
+```javascript
+const API_URL = "https://your-backend-url.onrender.com";
+```
+
+### Get Free API Keys
+
+**Groq API**:
 
 1. Visit [https://console.groq.com/](https://console.groq.com/)
-2. Sign up for a free account
-3. Navigate to API Keys section
-4. Create a new API key and copy it
+2. Sign up for free account
+3. Create API key and copy it
 
-### Step 2: Prepare Medical Documents
+**Pinecone**:
 
-1. Place your medical PDF documents in the `data/` directory
-2. Run the indexing script to create vector embeddings:
-
-```bash
-python store_index.py
-```
-
-This will:
-
-- Load PDFs from `data/` folder
-- Split documents into chunks
-- Generate embeddings using HuggingFace
-- Store vectors in Pinecone index
-
-## 🎮 Usage
-
-### Run the Application
-
-```bash
-python app.py
-```
-
-The Flask server will start at `http://127.0.0.1:5000`
-
-### Access the Chat Interface
-
-Open your browser and navigate to:
-
-```
-http://localhost:5000
-```
-
-### Example Queries
-
-- "What is diabetes?"
-- "What are the symptoms of hypertension?"
-- "Explain the side effects of acetaminophen"
-- "How to treat common cold?"
+1. Visit [https://www.pinecone.io/](https://www.pinecone.io/)
+2. Sign up for free account
+3. Create index named "medical-chatbotn"
 
 ## 📁 Project Structure
 
 ```
-Medical-Chatbot-using-Llama2/
+MedBot/
 │
-├── app.py                      # Flask application entry point
-├── store_index.py              # Script to create Pinecone index
-├── requirements.txt            # Python dependencies
-├── setup.py                    # Package setup
-├── .env                        # Environment variables (not in repo)
+├── backend/                    # Render deployment
+│   ├── app.py                  # Flask API
+│   ├── requirements.txt        # Python dependencies
+│   ├── Dockerfile              # Container config
+│   ├── src/                    # Helper modules
+│   └── data/                   # Medical PDFs
 │
-├── src/
-│   ├── __init__.py
-│   ├── helper.py               # Helper functions (PDF loading, embeddings)
-│   ├── prompt.py               # Prompt templates
-│   └── common_responses.py     # Common question responses cache
+├── frontend/                   # Netlify deployment
+│   ├── index.html              # Chat UI
+│   ├── app.js                  # API client
+│   ├── style.css               # Styling
+│   ├── logo.jpg                # Logo/favicon
+│   └── netlify.toml            # Netlify config
 │
-├── templates/
-│   └── chat.html               # Chat UI template
+├── .github/workflows/          # CI/CD automation
+│   ├── backend-ci-cd.yml       # Render deployment
+│   └── frontend-ci-cd.yml      # Netlify deployment
 │
-├── static/
-│   └── style.css               # UI styling
-│
-├── data/
-│   └── Medical_book.pdf        # Medical documents (PDFs)
-│
-└── research/
-    └── trials.ipynb            # Jupyter notebook for experiments
+└── render.yaml                 # Render config
 ```
 
 ## 🔍 How It Works
