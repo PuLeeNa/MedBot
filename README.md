@@ -10,6 +10,7 @@ An intelligent medical chatbot powered by **Groq API (Llama 3.3 70B)**, **LangCh
 ![Flask](https://img.shields.io/badge/Flask-3.1.0-green)
 ![LangChain](https://img.shields.io/badge/LangChain-1.1.0-orange)
 
+
 ## 📋 Table of Contents
 
 - [Features](#features)
