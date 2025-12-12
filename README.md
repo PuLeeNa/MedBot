@@ -2,7 +2,7 @@
 
 ## 🌐 Live Demo
 
-**Try it now:** [https://medbot-jvsz.onrender.com](https://medbot-jvsz.onrender.com)
+**Try it now:** [https://medic-bot.netlify.app](https://medic-bot.netlify.app)
 
 An intelligent medical chatbot powered by **Groq API (Llama 3.3 70B)**, **LangChain**, and **Pinecone** vector database. This RAG (Retrieval-Augmented Generation) application provides accurate medical information by retrieving relevant context from medical documents and generating fast, high-quality responses using Groq's lightning-fast inference API.
 
