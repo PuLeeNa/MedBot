@@ -1,0 +1,26 @@
+name: MedicalBot CI/CD
+
+on:
+  push:
+    branches: 
+        - main
+    paths:
+        - 'backend/**'
+        - 'frontend/**'
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: build image
+        run: |
+          docker build ./backend/ -t puleena/medicalbot-be:latest
+          docker build ./frontend/ -t puleena/medicalbot-fe:latest
+      - name: push image to docker hub
+        run: |
+          docker login -u puleena -p ${{ secrets.DOCKER_HUB_TOKEN }}
+          docker push puleena/medicalbot-be:latest
+          docker push puleena/medicalbot-fe:latest

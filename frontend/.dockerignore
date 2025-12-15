@@ -1,0 +1,25 @@
+# Git
+.git
+.gitignore
+
+# OS / Editor files
+.DS_Store
+Thumbs.db
+.vscode
+.idea
+
+# Logs
+*.log
+
+# Node-related (if ever present)
+node_modules
+npm-debug.log
+yarn.lock
+package-lock.json
+
+# Environment files
+.env
+.env.*
+
+# Docs (optional)
+README.md
