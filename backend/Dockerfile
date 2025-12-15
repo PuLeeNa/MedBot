@@ -44,20 +44,34 @@
 # # Run application with gunicorn for production (optimized for low memory)
 # CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "1", "--threads", "2", "--timeout", "300", "--max-requests", "100", "--max-requests-jitter", "10", "--worker-tmp-dir", "/dev/shm", "--access-logfile", "-", "--error-logfile", "-", "app:app"]
 
+# FROM python:3.10-slim
+
+# WORKDIR /app
+
+# # Copy requirements and install dependencies
+# COPY requirements.txt .
+
+# RUN pip install --no-cache-dir -r requirements.txt
+
+# # Copy application code
+# COPY . .
+
+# # Expose port
+# EXPOSE 5000
+
+# # Run the application
+# CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app"]
+
 FROM python:3.10-slim
 
 WORKDIR /app
 
-# Copy requirements and install dependencies
 COPY requirements.txt .
-
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code
 COPY . .
 
-# Expose port
-EXPOSE 5000
+ENV PYTHONUNBUFFERED=1
 
-# Run the application
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app"]
+CMD ["gunicorn", "app:app","--bind", "0.0.0.0:$PORT", "--workers", "1", "--timeout", "120"]
+
