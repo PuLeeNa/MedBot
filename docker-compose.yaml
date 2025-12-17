@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  con-medbot-fe:
+    image: puleena/medicalbot-fe
+    # build:
+    #   context: ./frontend
+    #   dockerfile: Dockerfile
+    ports: 
+      - 8081:80
+
+  con-medbot-be:
+    image: puleena/medicalbot-be
+    # build:
+    #   context: ./backend
+    #   dockerfile: Dockerfile
+    ports: 
+      - 5000:5000
+    env_file:
+      - .env
+
+
+# docker-compose up
