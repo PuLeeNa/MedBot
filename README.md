@@ -117,20 +117,6 @@ GROQ_API_KEY=your_groq_api_key_here
 const API_URL = "https://your-backend-url.onrender.com";
 ```
 
-### Get Free API Keys
-
-**Groq API**:
-
-1. Visit [https://console.groq.com/](https://console.groq.com/)
-2. Sign up for free account
-3. Create API key and copy it
-
-**Pinecone**:
-
-1. Visit [https://www.pinecone.io/](https://www.pinecone.io/)
-2. Sign up for free account
-3. Create index named "medical-chatbotn"
-
 ## 📁 Project Structure
 
 ```
@@ -164,119 +150,6 @@ MedBot/
 ├── docker-compose.yaml         # Docker orchestration
 └── render.yaml                 # Render config
 ```
-
-## 🔍 How It Works
-
-### 1. Document Processing (`store_index.py`)
-
-```python
-# Load PDFs
-documents = load_pdf("data/")
-
-# Split into chunks
-text_chunks = text_split(documents)
-
-# Generate embeddings
-embeddings = download_hugging_face_embeddings()
-
-# Store in Pinecone
-PineconeVectorStore.from_texts(text_chunks, embeddings, index_name="medical-chatbot")
-```
-
-### 2. Query Processing (`app.py`)
-
-```python
-# User sends query via Flask
-query = "What is diabetes?"
-
-# Retrieve relevant context from Pinecone (k=2 chunks)
-retriever = docsearch.as_retriever(search_kwargs={'k': 2})
-
-# Generate response using Llama 2 with context
-qa = RetrievalQA.from_chain_type(llm, retriever=retriever)
-response = qa.invoke({"query": query})
-```
-
-### 3. Model Configuration
-
-```python
-llm = ChatGroq(
-    model="llama-3.3-70b-versatile",  # Fast and efficient Groq model
-    temperature=0.8,                   # Creativity (0=deterministic, 1=creative)
-    max_tokens=1024,                   # Maximum response length
-    groq_api_key=os.getenv("GROQ_API_KEY")  # API key from .env file
-)
-```
-
-## 🐛 Troubleshooting
-
-### Issue: Token Limit Exceeded
-
-```
-Number of tokens (974) exceeded maximum context length (512)
-```
-
-**Solution**: Increase `context_length` and `max_new_tokens` in `app.py`
-
-### Issue: Rate Limit Exceeded
-
-```
-Rate limit exceeded: 30 requests per minute
-```
-
-**Solutions**:
-
-- Implement request queuing in Flask
-- Add caching for common questions (already included)
-- Upgrade to Groq paid tier if needed
-- Add rate limiting on frontend
-
-### Issue: Invalid API Key
-
-```
-AuthenticationError: Invalid API key
-```
-
-**Solution**: Verify your Groq API key in `.env` file:
-
-```bash
-GROQ_API_KEY=gsk_your_actual_key_here
-```
-
-### Issue: Conda Not Recognized
-
-**Solution**: Initialize conda for PowerShell:
-
-```powershell
-C:\ProgramData\Anaconda3\Scripts\conda.exe init powershell
-```
-
-Then restart PowerShell.
-
-## 🎯 Performance Optimization
-
-### Speed Improvements
-
-Groq API is already optimized for speed (up to 10x faster than local models), but you can further optimize:
-
-1. **Limit Tokens**: Set `max_tokens` to 512 for faster responses
-2. **Fewer Retrievals**: Use `search_kwargs={'k': 1}` for single-document retrieval
-3. **Use Caching**: Leverage `common_responses.py` for frequent questions
-4. **Optimize Embeddings**: Cache embedding results for repeated queries
-
-### Groq Free Tier Limits
-
-- **Requests per minute**: 30 RPM
-- **Requests per day**: 14,400 RPD
-- **Tokens per minute**: ~20,000 TPM
-- **Max context window**: 32,768 tokens
-
-### Rate Limit Management
-
-- Implement request queuing
-- Add exponential backoff on rate limit errors
-- Cache common responses
-- Consider upgrading to paid tier for production
 
 ## 🐳 Docker Deployment
 
@@ -322,15 +195,6 @@ docker-compose down
    - Automatically deploys on push to main branch
    - Ensure GitHub secrets are configured for your deployment targets
 
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
 
 ## 🙏 Acknowledgments
 
