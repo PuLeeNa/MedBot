@@ -10,21 +10,6 @@ An intelligent medical chatbot powered by **Groq API (Llama 3.3 70B)**, **LangCh
 ![Flask](https://img.shields.io/badge/Flask-3.1.0-green)
 ![LangChain](https://img.shields.io/badge/LangChain-1.1.0-orange)
 
-
-## 📋 Table of Contents
-
-- [Features](#features)
-- [Architecture](#architecture)
-- [Tech Stack](#tech-stack)
-- [Prerequisites](#prerequisites)
-- [Installation](#installation)
-- [Configuration](#configuration)
-- [Usage](#usage)
-- [Project Structure](#project-structure)
-- [How It Works](#how-it-works)
-- [Troubleshooting](#troubleshooting)
-- [Contributing](#contributing)
-
 ## ✨ Features
 
 - 🤖 **RAG-based Architecture**: Retrieves relevant medical information from documents before generating responses
@@ -40,7 +25,7 @@ An intelligent medical chatbot powered by **Groq API (Llama 3.3 70B)**, **LangCh
 
 **Split Deployment:**
 
-- **Frontend**: Static files on Netlify (fast CDN delivery, no cold start UI)
+- **Frontend**: Static files on Netlify
 - **Backend**: Flask API on Render (handles AI processing)
 
 This is a **RAG (Retrieval-Augmented Generation)** chatbot:
@@ -86,14 +71,14 @@ User → Netlify Frontend → Render Backend API → Pinecone → Groq LLM → R
 ### Backend (Render)
 
 1. Push to GitHub main branch
-2. Auto-deploys via `backend-ci-cd.yml`
-3. Requires secrets: `RENDER_SERVICE_ID`, `RENDER_API_KEY`
+2. Auto-deploys via `deploy.yml`
+3. Render will auto-detect `render.yaml` configuration
 
 ### Frontend (Netlify)
 
 1. Push to GitHub main branch
-2. Auto-deploys via `frontend-ci-cd.yml`
-3. Requires secrets: `NETLIFY_AUTH_TOKEN`, `NETLIFY_SITE_ID`
+2. Auto-deploys via Netlify configuration
+3. Netlify will auto-detect `netlify.toml` configuration
 
 ## 💻 Local Development
 
@@ -151,24 +136,32 @@ const API_URL = "https://your-backend-url.onrender.com";
 ```
 MedBot/
 │
-├── backend/                    # Render deployment
-│   ├── app.py                  # Flask API
+├── backend/                    # Backend API
+│   ├── app.py                  # Flask API server
 │   ├── requirements.txt        # Python dependencies
 │   ├── Dockerfile              # Container config
-│   ├── src/                    # Helper modules
-│   └── data/                   # Medical PDFs
+│   ├── data/                   # Medical PDF documents
+│   └── src/                    # Source modules
+│       ├── __init__.py
+│       ├── common_responses.py # Cached responses
+│       ├── helper.py           # Utility functions
+│       └── prompt.py           # Prompt templates
 │
-├── frontend/                   # Netlify deployment
-│   ├── index.html              # Chat UI
-│   ├── app.js                  # API client
+├── frontend/                   # Frontend UI
+│   ├── index.html              # Chat interface
+│   ├── app.js                  # API client logic
 │   ├── style.css               # Styling
 │   ├── logo.jpg                # Logo/favicon
+│   ├── Dockerfile              # Container config
 │   └── netlify.toml            # Netlify config
 │
 ├── .github/workflows/          # CI/CD automation
-│   ├── backend-ci-cd.yml       # Render deployment
-│   └── frontend-ci-cd.yml      # Netlify deployment
+│   └── deploy.yml              # Deployment workflow
 │
+├── store_index.py              # Pinecone indexing script
+├── setup.py                    # Package setup
+├── template.py                 # Project template
+├── docker-compose.yaml         # Docker orchestration
 └── render.yaml                 # Render config
 ```
 
@@ -325,20 +318,9 @@ docker-compose down
    - `PINECONE_API_KEY`: Your Pinecone API key
    - `GROQ_API_KEY`: Your Groq API key
 
-4. **Optional - Setup CI/CD**:
-   - Go to your GitHub repository Settings → Secrets and variables → Actions
-   - Add secret: `RENDER_DEPLOY_HOOK_URL` (get from Render Settings → Deploy Hook)
-   - CI/CD will auto-deploy on push to main branch
-
-### CI/CD Pipeline Features
-
-The GitHub Actions pipeline includes:
-
-- ✅ Code quality checks (flake8)
-- ✅ Security scanning (bandit)
-- ✅ Docker image build and test
-- ✅ Automated deployment to Render
-- ✅ Build caching for faster deployments
+4. **CI/CD is configured** via `.github/workflows/deploy.yml`
+   - Automatically deploys on push to main branch
+   - Ensure GitHub secrets are configured for your deployment targets
 
 ## 🤝 Contributing
 
